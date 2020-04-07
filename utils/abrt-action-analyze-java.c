@@ -77,8 +77,8 @@ write_results_to_dump_dir(const char *dir_name,
 static void
 write_to_fd(int fdout, const char *message)
 {
-    full_write(fdout, message, strlen(message));
-    full_write(fdout, "\n", 1);
+    libreport_full_write(fdout, message, strlen(message));
+    libreport_full_write(fdout, "\n", 1);
 }
 
 
@@ -120,26 +120,26 @@ write_results_to_file(const analysis_result_t *res_begin, const analysis_result_
 static char *
 backtrace_from_fd(int fdin)
 {
-    return xmalloc_read(fdin, /*no size limit*/NULL);
+    return libreport_xmalloc_read(fdin, /*no size limit*/NULL);
 }
 
 static char *
 backtrace_from_file(const char *file_name)
 {
-    return xmalloc_xopen_read_close(file_name, /*no size limit*/NULL);
+    return libreport_xmalloc_xopen_read_close(file_name, /*no size limit*/NULL);
 }
 
 static char *
 work_out_list_of_remote_urls(struct sr_java_stacktrace *stacktrace)
 {
-    struct strbuf *remote_files_csv = strbuf_new();
+    struct strbuf *remote_files_csv = libreport_strbuf_new();
     struct sr_java_thread *thread = stacktrace->threads;
     while (NULL != thread)
     {
         struct sr_java_frame *frame = thread->frames;
         while (NULL != frame)
         {
-            if (NULL != frame->class_path && prefixcmp(frame->class_path, "file://") != 0)
+            if (NULL != frame->class_path && libreport_prefixcmp(frame->class_path, "file://") != 0)
             {
                 struct stat buf;
                 if (stat(frame->class_path, &buf) && errno == ENOENT)
@@ -147,7 +147,7 @@ work_out_list_of_remote_urls(struct sr_java_stacktrace *stacktrace)
                     if (strstr(remote_files_csv->buf, frame->class_path) == NULL)
                     {
                         log_debug("Adding a new path to the list of remote paths: '%s'", frame->class_path);
-                        strbuf_append_strf(remote_files_csv, "%s%s",
+                        libreport_strbuf_append_strf(remote_files_csv, "%s%s",
                                 remote_files_csv->buf[0] != '\0' ? ", " : "",
                                 frame->class_path);
                     }
@@ -164,10 +164,10 @@ work_out_list_of_remote_urls(struct sr_java_stacktrace *stacktrace)
 
     if (remote_files_csv->buf[0] != '\0')
     {
-        return strbuf_free_nobuf(remote_files_csv);
+        return libreport_strbuf_free_nobuf(remote_files_csv);
     }
 
-    strbuf_free(remote_files_csv);
+    libreport_strbuf_free(remote_files_csv);
     return NULL;
 }
 
@@ -278,7 +278,7 @@ int main(int argc, char *argv[])
     };
     /* Keep enum above and order of options below in sync! */
     struct options program_options[] = {
-        OPT__VERBOSE(&g_verbose),
+        OPT__VERBOSE(&libreport_g_verbose),
         OPT_STRING('d', "dumpdir", &dump_dir_name, "DIR", _("Problem directory")),
         OPT_STRING('f', "backtrace", &backtrace_file, "FILE", _("Path to backtrace")),
         OPT_BOOL('r',   "norpmverify", NULL, _("Do not verify that all paths belongs to an rpm package")),
@@ -287,9 +287,9 @@ int main(int argc, char *argv[])
     };
     program_options[ARRAY_SIZE(program_options) - 1].type = OPTION_END;
 
-    unsigned opts = parse_opts(argc, argv, program_options, program_usage_string);
+    unsigned opts = libreport_parse_opts(argc, argv, program_options, program_usage_string);
 
-    export_abrt_envvars(0);
+    libreport_export_abrt_envvars(0);
 
     if (NULL != dump_dir_name && NULL != backtrace_file)
         error_msg_and_die("You need to pass either DIR or FILE");
@@ -331,7 +331,7 @@ int main(int argc, char *argv[])
 
     char *hash_str = NULL;
     struct sr_thread *crash_thread = (struct sr_thread *)stacktrace->threads;
-    if (g_verbose >= 3)
+    if (libreport_g_verbose >= 3)
     {
         hash_str = sr_thread_get_duphash(crash_thread, FRAMES_FOR_DUPHASH,
                 /*noprefix*/NULL, SR_DUPHASH_NOHASH);
@@ -357,7 +357,7 @@ int main(int argc, char *argv[])
     if (NULL != remote_files_csv)
     {
         results_iter->name = FILENAME_NOT_REPORTABLE;
-        results_iter->data = xasprintf(
+        results_iter->data = libreport_xasprintf(
         _("This problem can be caused by a 3rd party code from the "\
         "jar/class at %s. In order to provide valuable problem " \
         "reports, ABRT will not allow you to submit this problem. If you " \
@@ -369,7 +369,7 @@ int main(int argc, char *argv[])
     else if (contains_unkown_class(stacktrace))
     {
         results_iter->name = FILENAME_NOT_REPORTABLE;
-        results_iter->data = xasprintf(
+        results_iter->data = libreport_xasprintf(
         _("This problem is not reportable because of the low quality of stack trace. " \
         "The stack trace contains lines having unknown source files and unknown " \
         "classes. Such stack traces are usually produced by a non-official code. " \
@@ -381,7 +381,7 @@ int main(int argc, char *argv[])
     else if ((opts & OPT_r) == 0 && contains_unpackaged_path(stacktrace))
     {
         results_iter->name = FILENAME_NOT_REPORTABLE;
-        results_iter->data = xasprintf(
+        results_iter->data = libreport_xasprintf(
         _("This problem has been caused by a proprietary code which has not been "
         "provided any official package. Please contact the provider of the "
         "proprietary code.")

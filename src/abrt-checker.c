@@ -596,7 +596,7 @@ static void add_process_properties_data(problem_data_t *pd)
 {
     pid_t pid = getpid();
 
-    char *environ = get_environ(pid);
+    char *environ = libreport_get_environ(pid);
     problem_data_add_text_editable(pd, FILENAME_ENVIRON, environ ? environ : "");
     free(environ);
 
@@ -643,7 +643,7 @@ static char *escape_newline_chars(const char *str)
     if (NULL == mem)
     {
         perror("ERROR: failed to open memstream");
-        return xasprintf("Error in abrt-java-connector: failed to open memstream");
+        return libreport_xasprintf("Error in abrt-java-connector: failed to open memstream");
     }
 
     for (int i = 0; str[i] != '\0'; ++i)
@@ -674,18 +674,18 @@ static void write_to_cel(
 
     char *bt_escaped_newline = escape_newline_chars(backtrace);
 
-    char *json = xasprintf("{\"%s\": \"%s\", "
-                            "\"%s\": \"%s\", "
-                            "\"%s\": \"%s\", "
-                            "\"%s\": \"%s\", "
-                            "\"%s\": \"%s\", "
-                            "\"%s\": \"%s\"}\n",
-                            FILENAME_TYPE, FILENAME_TYPE_VALUE, /* type */
-                            FILENAME_EXECUTABLE, executable, /* executable */
-                            FILENAME_REASON, message, /* reason */
-                            FILENAME_BACKTRACE, bt_escaped_newline, /* backtrace */
-                            FILENAME_UID, uid, /* uid */
-                            "abrt-java-connector", VERSION);
+    char *json = libreport_xasprintf("{\"%s\": \"%s\", "
+                                      "\"%s\": \"%s\", "
+                                      "\"%s\": \"%s\", "
+                                      "\"%s\": \"%s\", "
+                                      "\"%s\": \"%s\", "
+                                      "\"%s\": \"%s\"}\n",
+                                     FILENAME_TYPE, FILENAME_TYPE_VALUE, /* type */
+                                     FILENAME_EXECUTABLE, executable, /* executable */
+                                     FILENAME_REASON, message, /* reason */
+                                     FILENAME_BACKTRACE, bt_escaped_newline, /* backtrace */
+                                     FILENAME_UID, uid, /* uid */
+                                     "abrt-java-connector", VERSION);
 
     free(bt_escaped_newline);
 
@@ -1167,7 +1167,7 @@ char *get_executable(int pid)
     char buf[sizeof("/proc/%lu/exe") + sizeof(long)*3];
 
     sprintf(buf, "/proc/%lu/exe", (long)pid);
-    char *executable = malloc_readlink(buf);
+    char *executable = libreport_malloc_readlink(buf);
     if (!executable)
     {
         fprintf(stderr, __FILE__ ":" STRINGIZE(__LINE__) ": can't read executable name from /proc/${PID}/exe");

@@ -401,10 +401,10 @@ void parse_commandline_options(T_configuration *conf, char *options)
 void parse_configuration_file(T_configuration *conf, const char *filename)
 {
     /* Remains empty if any of the loading functions below fails */
-    map_string_t *settings = new_map_string();
+    map_string_t *settings = libreport_new_map_string();
     if (filename[0] == '/')
     {
-        load_conf_file(filename, settings, /*skip empty*/0);
+        libreport_load_conf_file(filename, settings, /*skip empty*/0);
     }
     else
     {
@@ -417,13 +417,13 @@ void parse_configuration_file(T_configuration *conf, const char *filename)
     };
 
     map_string_iter_t iter;
-    init_map_string_iter(&iter, settings);
+    libreport_init_map_string_iter(&iter, settings);
     const char *key;
     const char *value;
-    while(next_map_string_iter(&iter, &key, &value))
+    while(libreport_next_map_string_iter(&iter, &key, &value))
     {
         parse_key_value(conf, key, value, &ctx);
     }
 
-    free_map_string(settings);
+    libreport_free_map_string(settings);
 }
