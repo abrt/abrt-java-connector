@@ -357,7 +357,7 @@ int main(int argc, char *argv[])
     if (NULL != remote_files_csv)
     {
         results_iter->name = FILENAME_NOT_REPORTABLE;
-        results_iter->data = libreport_xasprintf(
+        results_iter->data = g_strdup_printf(
         _("This problem can be caused by a 3rd party code from the "\
         "jar/class at %s. In order to provide valuable problem " \
         "reports, ABRT will not allow you to submit this problem. If you " \
@@ -369,7 +369,7 @@ int main(int argc, char *argv[])
     else if (contains_unkown_class(stacktrace))
     {
         results_iter->name = FILENAME_NOT_REPORTABLE;
-        results_iter->data = libreport_xasprintf(
+        results_iter->data = g_strdup_printf(
         _("This problem is not reportable because of the low quality of stack trace. " \
         "The stack trace contains lines having unknown source files and unknown " \
         "classes. Such stack traces are usually produced by a non-official code. " \
@@ -381,7 +381,7 @@ int main(int argc, char *argv[])
     else if ((opts & OPT_r) == 0 && contains_unpackaged_path(stacktrace))
     {
         results_iter->name = FILENAME_NOT_REPORTABLE;
-        results_iter->data = libreport_xasprintf(
+        results_iter->data = g_strdup_printf(
         _("This problem has been caused by a proprietary code which has not been "
         "provided any official package. Please contact the provider of the "
         "proprietary code.")

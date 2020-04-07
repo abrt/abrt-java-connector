@@ -643,7 +643,7 @@ static char *escape_newline_chars(const char *str)
     if (NULL == mem)
     {
         perror("ERROR: failed to open memstream");
-        return libreport_xasprintf("Error in abrt-java-connector: failed to open memstream");
+        return g_strdup_printf("Error in abrt-java-connector: failed to open memstream");
     }
 
     for (int i = 0; str[i] != '\0'; ++i)
@@ -674,18 +674,18 @@ static void write_to_cel(
 
     char *bt_escaped_newline = escape_newline_chars(backtrace);
 
-    char *json = libreport_xasprintf("{\"%s\": \"%s\", "
-                                      "\"%s\": \"%s\", "
-                                      "\"%s\": \"%s\", "
-                                      "\"%s\": \"%s\", "
-                                      "\"%s\": \"%s\", "
-                                      "\"%s\": \"%s\"}\n",
-                                     FILENAME_TYPE, FILENAME_TYPE_VALUE, /* type */
-                                     FILENAME_EXECUTABLE, executable, /* executable */
-                                     FILENAME_REASON, message, /* reason */
-                                     FILENAME_BACKTRACE, bt_escaped_newline, /* backtrace */
-                                     FILENAME_UID, uid, /* uid */
-                                     "abrt-java-connector", VERSION);
+    char *json = g_strdup_printf("{\"%s\": \"%s\", "
+                                  "\"%s\": \"%s\", "
+                                  "\"%s\": \"%s\", "
+                                  "\"%s\": \"%s\", "
+                                  "\"%s\": \"%s\", "
+                                  "\"%s\": \"%s\"}\n",
+                                 FILENAME_TYPE, FILENAME_TYPE_VALUE, /* type */
+                                 FILENAME_EXECUTABLE, executable, /* executable */
+                                 FILENAME_REASON, message, /* reason */
+                                 FILENAME_BACKTRACE, bt_escaped_newline, /* backtrace */
+                                 FILENAME_UID, uid, /* uid */
+                                 "abrt-java-connector", VERSION);
 
     free(bt_escaped_newline);
 
