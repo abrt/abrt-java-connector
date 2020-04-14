@@ -24,7 +24,7 @@ enum {
 
 
 /*
- * Used by load_abrt_plugin_conf_file()
+ * Used by abrt_load_abrt_plugin_conf_file()
  */
 static const char *const s_defaultConfFile = "java.conf";
 
@@ -408,7 +408,7 @@ void parse_configuration_file(T_configuration *conf, const char *filename)
     }
     else
     {
-        load_abrt_plugin_conf_file(filename, settings);
+        abrt_load_abrt_plugin_conf_file(filename, settings);
     }
 
     T_context ctx = {
