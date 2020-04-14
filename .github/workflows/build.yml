@@ -33,3 +33,5 @@ jobs:
           dnf --assumeyes install abrt
           abrtd
           sudo -u runner make -C build test ARGS=--output-on-failure
+        env:
+          _JAVA_OPTIONS: -Djava.net.preferIPv6Addresses=true
