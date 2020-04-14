@@ -24,6 +24,7 @@ jobs:
 
       - name: Build
         run: |
+          chown -R runner. .
           sudo -u runner cmake -S . -B build
           sudo -u runner make -C build
 
