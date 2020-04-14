@@ -103,6 +103,8 @@ function(_add_test_target target_name)
             set(current_var depends)
         elseif(arg_val STREQUAL "AGENT_OPTIONS")
             set(current_var agent_options)
+        elseif(arg_val STREQUAL "JAVA_OPTIONS")
+            set(current_var java_options)
         else()
             set(${current_var} ${${current_var}} ${arg_val})
         endif()
@@ -115,7 +117,7 @@ function(_add_test_target target_name)
         ${target_name}
         ${pre_command}
 # -Xdebug -Xrunjdwp:transport=dt_socket,address=8001,server=y,suspend=n + jdb -attach 8001
-        COMMAND LD_LIBRARY_PATH=${CMAKE_BINARY_DIR}/src ${Java_JAVA_EXECUTABLE} -agentlib:${AGENT_NAME}="${agent_options},abrt=$$ABRT_ENABLED,output=${target_name}.log" ${java_params}
+        COMMAND LD_LIBRARY_PATH=${CMAKE_BINARY_DIR}/src _JAVA_OPTIONS=${java_options} ${Java_JAVA_EXECUTABLE} -agentlib:${AGENT_NAME}="${agent_options},abrt=$$ABRT_ENABLED,output=${target_name}.log" ${java_params}
         DEPENDS AbrtChecker ${depends}
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
@@ -142,6 +144,7 @@ _add_test_target(
     Test
     DEPENDS ${TEST_JAVA_TARGETS}
     AGENT_OPTIONS caught=java.lang.ArrayIndexOutOfBoundsException:java.lang.NullPointerException:java.lang.UnsatisfiedLinkError:java.lang.ClassCastException:java.lang.StringIndexOutOfBoundsException:java.net.MalformedURLException:java.net.ConnectException:java.net.UnknownHostException:java.lang.NumberFormatException:java.io.FileNotFoundException
+    JAVA_OPTIONS -Djava.net.preferIPv4Stack=true
 )
 _add_test(run_test 2 1)
 
