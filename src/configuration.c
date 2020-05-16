@@ -417,7 +417,7 @@ void parse_configuration_file(T_configuration *conf, const char *filename)
     };
 
     map_string_iter_t iter;
-    libreport_init_map_string_iter(&iter, settings);
+    g_hash_table_iter_init(&iter, settings);
     const char *key;
     const char *value;
     while(libreport_next_map_string_iter(&iter, &key, &value))
