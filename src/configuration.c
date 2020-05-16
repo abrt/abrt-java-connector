@@ -418,11 +418,11 @@ void parse_configuration_file(T_configuration *conf, const char *filename)
 
     map_string_iter_t iter;
     g_hash_table_iter_init(&iter, settings);
-    const char *key;
-    const char *value;
-    while(libreport_next_map_string_iter(&iter, &key, &value))
+    gpointer key;
+    gpointer value;
+    while(g_hash_table_iter_next(&iter, &key, &value))
     {
-        parse_key_value(conf, key, value, &ctx);
+        parse_key_value(conf, (char *)key, (char *)value, &ctx);
     }
 
     if (settings)
