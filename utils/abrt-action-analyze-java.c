@@ -139,7 +139,7 @@ work_out_list_of_remote_urls(struct sr_java_stacktrace *stacktrace)
         struct sr_java_frame *frame = thread->frames;
         while (NULL != frame)
         {
-            if (NULL != frame->class_path && libreport_prefixcmp(frame->class_path, "file://") != 0)
+            if (NULL != frame->class_path && g_str_has_prefix(frame->class_path, "file://") == 0)
             {
                 struct stat buf;
                 if (stat(frame->class_path, &buf) && errno == ENOENT)
