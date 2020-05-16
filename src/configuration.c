@@ -401,7 +401,7 @@ void parse_commandline_options(T_configuration *conf, char *options)
 void parse_configuration_file(T_configuration *conf, const char *filename)
 {
     /* Remains empty if any of the loading functions below fails */
-    map_string_t *settings = libreport_new_map_string();
+    map_string_t *settings = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
     if (filename[0] == '/')
     {
         libreport_load_conf_file(filename, settings, /*skip empty*/0);
