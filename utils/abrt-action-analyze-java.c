@@ -132,7 +132,7 @@ backtrace_from_file(const char *file_name)
 static char *
 work_out_list_of_remote_urls(struct sr_java_stacktrace *stacktrace)
 {
-    struct strbuf *remote_files_csv = libreport_strbuf_new();
+    GString *remote_files_csv = g_string_new(NULL);
     struct sr_java_thread *thread = stacktrace->threads;
     while (NULL != thread)
     {
@@ -144,11 +144,11 @@ work_out_list_of_remote_urls(struct sr_java_stacktrace *stacktrace)
                 struct stat buf;
                 if (stat(frame->class_path, &buf) && errno == ENOENT)
                 {
-                    if (strstr(remote_files_csv->buf, frame->class_path) == NULL)
+                    if (strstr(remote_files_csv->str, frame->class_path) == NULL)
                     {
                         log_debug("Adding a new path to the list of remote paths: '%s'", frame->class_path);
-                        libreport_strbuf_append_strf(remote_files_csv, "%s%s",
-                                remote_files_csv->buf[0] != '\0' ? ", " : "",
+                        g_string_append_printf(remote_files_csv, "%s%s",
+                                remote_files_csv->str[0] != '\0' ? ", " : "",
                                 frame->class_path);
                     }
                     else
@@ -162,12 +162,12 @@ work_out_list_of_remote_urls(struct sr_java_stacktrace *stacktrace)
         thread = thread->next;
     }
 
-    if (remote_files_csv->buf[0] != '\0')
+    if (remote_files_csv->str[0] != '\0')
     {
-        return libreport_strbuf_free_nobuf(remote_files_csv);
+        return g_string_free(remote_files_csv, FALSE);
     }
 
-    libreport_strbuf_free(remote_files_csv);
+    g_string_free(remote_files_csv, TRUE);
     return NULL;
 }
 
