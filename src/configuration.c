@@ -425,5 +425,6 @@ void parse_configuration_file(T_configuration *conf, const char *filename)
         parse_key_value(conf, key, value, &ctx);
     }
 
-    libreport_free_map_string(settings);
+    if (settings)
+        g_hash_table_destroy(settings);
 }
