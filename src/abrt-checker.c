@@ -570,7 +570,7 @@ static int exception_is_intended_to_be_reported(
  */
 static void add_jvm_environment_data(problem_data_t *pd)
 {
-    char *jvm_env = NULL;
+    g_autofree char *jvm_env = NULL;
     size_t sizeloc = 0;
     FILE *mem = open_memstream(&jvm_env, &sizeloc);
 
@@ -584,7 +584,6 @@ static void add_jvm_environment_data(problem_data_t *pd)
     fclose(mem);
 
     problem_data_add_text_editable(pd, "jvm_environment", jvm_env);
-    free(jvm_env);
 }
 
 
@@ -621,11 +620,10 @@ static void add_process_properties_data(problem_data_t *pd)
  */
 static void add_additional_info_data(problem_data_t *pd, T_infoPair *additional_info)
 {
-    char *contents = info_pair_vector_to_string(additional_info);
+    g_autofree char *contents = info_pair_vector_to_string(additional_info);
     if (NULL != contents)
     {
         problem_data_add_text_editable(pd, "java_custom_debug_info", contents);
-        free(contents);
     }
 }
 
@@ -672,9 +670,9 @@ static void write_to_cel(
     char uid[11];
     get_uid_as_string(uid);
 
-    char *bt_escaped_newline = escape_newline_chars(backtrace);
+    g_autofree char *bt_escaped_newline = escape_newline_chars(backtrace);
 
-    char *json = g_strdup_printf("{\"%s\": \"%s\", "
+    g_autofree char *json = g_strdup_printf("{\"%s\": \"%s\", "
                                   "\"%s\": \"%s\", "
                                   "\"%s\": \"%s\", "
                                   "\"%s\": \"%s\", "
@@ -686,8 +684,6 @@ static void write_to_cel(
                                  FILENAME_BACKTRACE, bt_escaped_newline, /* backtrace */
                                  FILENAME_UID, uid, /* uid */
                                  "abrt-java-connector", VERSION);
-
-    free(bt_escaped_newline);
 
     VERBOSE_PRINT("CEL JSON message: %s\n", json);
 
@@ -733,8 +729,6 @@ static void write_to_cel(
         close(fd[1]); /* close file descriptor for writing */
         wait(NULL);
     }
-
-    free(json);
 
     return;
 }
@@ -834,12 +828,11 @@ static void report_stacktrace(
     }
     if (additional_info)
     {
-        char *info = info_pair_vector_to_string(additional_info);
+        g_autofree char *info = info_pair_vector_to_string(additional_info);
         if (NULL != info)
         {
             log_print("%s\n", info);
         }
-        free(info);
     }
 
     if (NULL != stacktrace)
@@ -1761,7 +1754,7 @@ static char* get_path_to_class_class_loader(
     char *out = NULL;
     jclass class_loader_class = NULL;
 
-    char *upd_class_name = (char*)malloc(strlen(class_name) + sizeof("class") + 1);
+    g_autofree char *upd_class_name = (char*)malloc(strlen(class_name) + sizeof("class") + 1);
     if (NULL == upd_class_name)
     {
         fprintf(stderr, __FILE__ ":" STRINGIZE(__LINE__) ": malloc(): out of memory");
@@ -1776,7 +1769,6 @@ static char* get_path_to_class_class_loader(
     if (check_and_clear_exception(jni_env) || class_loader_class ==  NULL)
     {
         VERBOSE_PRINT(__FILE__ ":" STRINGIZE(__LINE__)": Could not get class of java/lang/ClassLoader\n");
-        free(upd_class_name);
         return NULL;
     }
 
@@ -1785,14 +1777,12 @@ static char* get_path_to_class_class_loader(
     if (check_and_clear_exception(jni_env) || get_resource ==  NULL)
     {
         VERBOSE_PRINT(__FILE__ ":" STRINGIZE(__LINE__)": Could not get methodID of java/lang/ClassLoader.getResource(Ljava/lang/String;)Ljava/net/URL;\n");
-        free(upd_class_name);
         (*jni_env)->DeleteLocalRef(jni_env, class_loader_class);
         return NULL;
     }
 
     /* convert new class name into a Java String */
     jstring j_class_name = (*jni_env)->NewStringUTF(jni_env, upd_class_name);
-    free(upd_class_name);
     if (check_and_clear_exception(jni_env))
     {
         VERBOSE_PRINT(__FILE__ ":" STRINGIZE(__LINE__)": Could not allocate a new UTF string for '%s'\n", upd_class_name);
@@ -2025,7 +2015,7 @@ static int print_stack_trace_element(
 
     if (NULL != class_of_frame_method)
     {
-        char *updated_cls_name_str = create_updated_class_name(cls_name_str);
+        g_autofree char *updated_cls_name_str = create_updated_class_name(cls_name_str);
         if (updated_cls_name_str != NULL)
         {
             class_location = get_path_to_class(jvmti_env, jni_env, class_of_frame_method, updated_cls_name_str, TO_EXTERNAL_FORM_METHOD_NAME);
@@ -2036,8 +2026,6 @@ static int print_stack_trace_element(
                 if (NULL != *class_fs_path)
                     *class_fs_path = extract_fs_path(*class_fs_path);
             }
-
-            free(updated_cls_name_str);
         }
         (*jni_env)->DeleteLocalRef(jni_env, class_of_frame_method);
     }
@@ -2317,9 +2305,8 @@ static void print_one_method_from_stack(
         strcpy(line_number_buf, "Unknown location");
     }
 
-    char *class_location = get_path_to_class(jvmti_env, jni_env, declaring_class, updated_class_name, TO_EXTERNAL_FORM_METHOD_NAME);
+    g_autofree char *class_location = get_path_to_class(jvmti_env, jni_env, declaring_class, updated_class_name, TO_EXTERNAL_FORM_METHOD_NAME);
     sprintf(buf, "\tat %s%s(%s:%s) [%s]\n", updated_class_name, method_name, source_file_name, line_number_buf, class_location == NULL ? "unknown" : class_location);
-    free(class_location);
     strncat(stack_trace_str, buf, MAX_STACK_TRACE_STRING_LENGTH - strlen(stack_trace_str) - 1);
 
 #ifdef VERBOSE
@@ -2431,7 +2418,7 @@ static void JNICALL callback_on_exception(
     if (NULL != catch_method && NULL == globalConfig.reportedCaughExceptionTypes)
         return;
 
-    char *exception_type_name = NULL;
+    g_autofree char *exception_type_name = NULL;
 
     /* all operations should be processed in critical section */
     enter_critical_section(jvmti_env, shared_lock);
@@ -2463,6 +2450,9 @@ static void JNICALL callback_on_exception(
             char *method_signature_ptr = NULL;
             char *class_name_ptr = NULL;
             char *class_signature_ptr = NULL;
+            g_autofree char *message = NULL;
+            g_autofree char *executable = NULL;
+            g_autofree char *stack_trace_str = NULL;
 
             error_code = (*jvmti_env)->GetMethodName(jvmti_env, method, &method_name_ptr, &method_signature_ptr, NULL);
             if (check_jvmti_error(jvmti_env, error_code, __FILE__ ":" STRINGIZE(__LINE__)))
@@ -2486,11 +2476,10 @@ static void JNICALL callback_on_exception(
             if (NULL == exception_type_name)
                 exception_type_name = get_exception_type_name(jvmti_env, jni_env, exception_object);
 
-            char *message = format_exception_reason_message(/*caught?*/NULL != catch_method,
+            message = format_exception_reason_message(/*caught?*/NULL != catch_method,
                     exception_type_name, class_name_ptr, method_name_ptr);
 
-            char *executable = NULL;
-            char *stack_trace_str = generate_thread_stack_trace(jvmti_env, jni_env, tname, exception_object,
+            stack_trace_str = generate_thread_stack_trace(jvmti_env, jni_env, tname, exception_object,
                     (globalConfig.executableFlags & ABRT_EXECUTABLE_THREAD) ? &executable : NULL);
 
             T_infoPair *additional_info = collect_additional_debug_information(jvmti_env, jni_env);
@@ -2545,9 +2534,6 @@ static void JNICALL callback_on_exception(
                 }
             }
 
-            free(executable);
-            free(message);
-            free(stack_trace_str);
             info_pair_vector_free(additional_info);
 
 callback_on_exception_cleanup:
@@ -2573,12 +2559,6 @@ callback_on_exception_cleanup:
             VERBOSE_PRINT("The exception was already reported!\n");
         }
     }
-
-    if (NULL != exception_type_name)
-    {
-        free(exception_type_name);
-    }
-
     exit_critical_section(jvmti_env, shared_lock);
 }
 
