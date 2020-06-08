@@ -132,7 +132,7 @@ backtrace_from_file(const char *file_name)
 static char *
 work_out_list_of_remote_urls(struct sr_java_stacktrace *stacktrace)
 {
-    GString *remote_files_csv = g_string_new(NULL);
+    g_autoptr(GString) remote_files_csv = g_string_new(NULL);
     struct sr_java_thread *thread = stacktrace->threads;
     while (NULL != thread)
     {
@@ -164,10 +164,9 @@ work_out_list_of_remote_urls(struct sr_java_stacktrace *stacktrace)
 
     if (remote_files_csv->str[0] != '\0')
     {
-        return g_string_free(remote_files_csv, FALSE);
+        return g_string_free(g_steal_pointer(&remote_files_csv), FALSE);
     }
 
-    g_string_free(remote_files_csv, TRUE);
     return NULL;
 }
 
