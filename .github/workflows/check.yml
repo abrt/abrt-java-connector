@@ -1,0 +1,73 @@
+name: Check
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+jobs:
+  check:
+    name: Check
+    container:
+      image: fedora:latest
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out sources
+        uses: actions/checkout@v2
+
+      - name: Set up build environment
+        run: |
+          dnf --assumeyes install @c-development diffutils dnf-plugins-core
+          dnf builddep --assumeyes --spec package/abrt-java-connector.spec
+
+      - name: Create build user
+        run: useradd --no-create-home runner
+
+      - name: Build
+        run: |
+          chown -R runner. .
+          sudo -u runner cmake -S . -B build
+          sudo -u runner make -C build
+
+      - name: Run tests
+        run: |
+          dnf --assumeyes install abrt
+          abrtd
+          sudo -u runner make -C build test ARGS=--output-on-failure
+        env:
+          _JAVA_OPTIONS: -Djava.net.preferIPv6Addresses=true
+  check_valgrind:
+    name: Check (Valgrind)
+    container:
+      image: fedora:latest
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out sources
+        uses: actions/checkout@v2
+
+      - name: Set up build environment
+        run: |
+          dnf --assumeyes install @c-development diffutils dnf-plugins-core valgrind
+          dnf builddep --assumeyes --spec package/abrt-java-connector.spec
+
+      - name: Create build user
+        run: useradd --no-create-home runner
+
+      - name: Build
+        run: |
+          chown -R runner. .
+          sudo -u runner cmake -DCMAKE_BUILD_TYPE=Debug -S . -B build
+          sudo -u runner make -C build
+
+      - name: Run tests
+        run: |
+          dnf --assumeyes install abrt
+          abrtd
+          sudo -u runner \
+            cmake -E env \
+                TEST_WRAPPER=valgrind \
+                TEST_WRAPPER_ARGS=--error-exitcode=1 \
+                make -C build test ARGS=--output-on-failure
+        env:
+          _JAVA_OPTIONS: -Djava.net.preferIPv6Addresses=true

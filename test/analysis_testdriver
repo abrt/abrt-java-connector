@@ -6,7 +6,7 @@
 #   $4 - path to expected output log file
 #
 
-$1/abrt-action-analyze-java -f $2 -o > $3 || exit 1
+$TEST_WRAPPER $TEST_WRAPPER_ARGS $1/abrt-action-analyze-java -f $2 -o > $3 || exit 1
 
 diff -u $4 $3
 EC=$?
