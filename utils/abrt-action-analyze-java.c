@@ -148,7 +148,7 @@ work_out_list_of_remote_urls(struct sr_java_stacktrace *stacktrace)
                     {
                         log_debug("Adding a new path to the list of remote paths: '%s'", frame->class_path);
                         g_string_append_printf(remote_files_csv, "%s%s",
-                                remote_files_csv->str[0] != '\0' ? ", " : "",
+                                remote_files_csv->len ? ", " : "",
                                 frame->class_path);
                     }
                     else
@@ -162,7 +162,7 @@ work_out_list_of_remote_urls(struct sr_java_stacktrace *stacktrace)
         thread = thread->next;
     }
 
-    if (remote_files_csv->str[0] != '\0')
+    if (remote_files_csv->len)
     {
         return g_string_free(g_steal_pointer(&remote_files_csv), FALSE);
     }
