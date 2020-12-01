@@ -24,6 +24,7 @@ BuildRequires: gcc-c++
 BuildRequires: gettext
 # Tests have been redone to work under Java 11, but they are not backwards-compatible.
 BuildRequires: java-11-devel
+BuildRequires: make
 BuildRequires: pkgconfig(libreport) >= 2.14.0
 BuildRequires: rpm-devel
 BuildRequires: satyr-devel
