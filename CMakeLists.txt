@@ -19,16 +19,16 @@ execute_process(
 
 if(git_result EQUAL 0)
     execute_process(
-        COMMAND git describe --tags --match "[0-9]*" --abbrev=0 HEAD
+        COMMAND git describe --tags --match "[0-9]*" HEAD
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
         RESULT_VARIABLE git_result
         OUTPUT_VARIABLE git_tag
         ERROR_QUIET)
 
     if(git_result EQUAL 0)
-        string(REGEX REPLACE "(\r?\n)+$" "" git_short_commit "${git_short_commit}")
         string(REGEX REPLACE "(\r?\n)+$" "" git_tag "${git_tag}")
-        set(PROJECT_VERSION ${git_tag}-${git_short_commit})
+        string(REGEX REPLACE "-[0-9]+-g" ".g" git_tag "${git_tag}")
+        set(PROJECT_VERSION ${git_tag})
     endif()
 
     execute_process(
@@ -68,7 +68,7 @@ endif()
 
 add_custom_target(
     dist
-    COMMAND git archive --prefix=${CMAKE_PROJECT_NAME}-${git_commit}/ HEAD | gzip > ${CMAKE_BINARY_DIR}/${ARCHIVE_NAME}.tar.gz
+    COMMAND git archive --prefix=${CMAKE_PROJECT_NAME}-${git_tag}/ HEAD | gzip > ${CMAKE_BINARY_DIR}/${ARCHIVE_NAME}.tar.gz
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 )
 

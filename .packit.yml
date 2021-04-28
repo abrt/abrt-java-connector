@@ -1,7 +1,7 @@
-specfile_path: package/abrt-java-connector.spec
+specfile_path: abrt-java-connector.spec
 synced_files:
   - .packit.yml
-  - package/abrt-java-connector.spec
+  - abrt-java-connector.spec
 upstream_package_name: abrt-java-connector
 upstream_project_url: https://github.com/abrt/abrt-java-connector
 downstream_package_name: abrt-java-connector

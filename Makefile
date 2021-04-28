@@ -15,7 +15,6 @@
 
 
 OUT_DIR=bin
-PKG_DIR=package
 
 all: run
 
@@ -35,22 +34,20 @@ dist: $(OUT_DIR)
 
 RPM_DIRS = --define "_sourcedir `pwd`/$(OUT_DIR)" \
 		--define "_rpmdir `pwd`/$(OUT_DIR)" \
-		--define "_specdir `pwd`/$(PKG_DIR)" \
+		--define "_specdir `pwd`" \
 		--define "_builddir `pwd`/$(OUT_DIR)" \
 		--define "_srcrpmdir `pwd`/$(OUT_DIR)"
 
 .PHONY: rpm
 rpm: dist
-	sed -e 's/global commit .*$$/global commit '"$$(git log -1 --format=%H)"'/' \
-		-e 's/%{?dist}/.'"$$(git log -1 --format=%h)%{?dist}"'/' \
-		$(PKG_DIR)/abrt-java-connector.spec > $(OUT_DIR)/abrt-java-connector.spec && \
+	-test "$$(git describe --match="[0-9]*" --tags HEAD | sed 's/[0-9]\+\.[0-9]\+\.[0-9]\+//')" \
+		&& sed -e '/^Version:.*/s/$$/'"$$(git log -1 --format=.g%h)"'/' abrt-java-connector.spec > $(OUT_DIR)/abrt-java-connector.spec
 	rpmbuild $(RPM_DIRS) $(RPM_FLAGS) -ba $(OUT_DIR)/abrt-java-connector.spec
 
 .PHONY: srpm
 srpm: dist
-	sed -e 's/global commit .*$$/global commit '"$$(git log -1 --format=%H)"'/' \
-		-e 's/%{?dist}/.'"$$(git log -1 --format=%h)%{?dist}"'/' \
-		$(PKG_DIR)/abrt-java-connector.spec > $(OUT_DIR)/abrt-java-connector.spec && \
+	-test "$$(git describe --match="[0-9]*" --tags HEAD | sed 's/[0-9]\+\.[0-9]\+\.[0-9]\+//')" \
+		&& sed -e '/^Version:.*/s/$$/'"$$(git log -1 --format=.g%h)"'/' abrt-java-connector.spec > $(OUT_DIR)/abrt-java-connector.spec
 	rpmbuild $(RPM_DIRS) $(RPM_FLAGS) -bs $(OUT_DIR)/abrt-java-connector.spec
 
 # Make sure the output dir is created

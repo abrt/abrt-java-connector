@@ -1,7 +1,3 @@
-%global snapshot 0
-%global commit bef7e39ce5fdc4a8a620d56be186d4463ed761a8
-%global shortcommit %(c=%{commit}; echo ${c:0:7})
-
 Name:          abrt-java-connector
 Version:       1.2.0
 Release:       1%{?dist}
@@ -10,11 +6,7 @@ Summary:       JNI Agent library converting Java exceptions to ABRT problems
 Group:         System Environment/Libraries
 License:       GPLv2+
 URL:           https://github.com/abrt/abrt-java-connector
-%if 0%{?snapshot}
-Source0:       %{url}/archive/%{commit}/%{name}-%{version}-%{shortcommit}.tar.gz
-%else
 Source0:       %{url}/archive/%{version}/%{name}-%{version}.tar.gz
-%endif
 
 BuildRequires: pkgconfig(abrt) >= 2.14.1
 BuildRequires: check-devel
@@ -49,11 +41,7 @@ This package contains only minimal set of files needed for container exception
 logging.
 
 %prep
-%if 0%{?snapshot}
-%autosetup -n %{name}-%{commit}
-%else
-%autosetup
-%endif
+%autosetup -n %{name}-%{version}
 
 
 %build

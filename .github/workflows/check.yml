@@ -18,7 +18,7 @@ jobs:
       - name: Set up build environment
         run: |
           dnf --assumeyes install @c-development diffutils dnf-plugins-core
-          dnf builddep --assumeyes --spec package/abrt-java-connector.spec
+          dnf builddep --assumeyes --spec abrt-java-connector.spec
 
       - name: Create build user
         run: useradd --no-create-home runner
@@ -49,7 +49,7 @@ jobs:
       - name: Set up build environment
         run: |
           dnf --assumeyes install @c-development diffutils dnf-plugins-core valgrind
-          dnf builddep --assumeyes --spec package/abrt-java-connector.spec
+          dnf builddep --assumeyes --spec abrt-java-connector.spec
 
       - name: Create build user
         run: useradd --no-create-home runner
