@@ -61,8 +61,13 @@ logging.
 %cmake_build
 
 
+%check
+%ctest
+
+
 %install
 %cmake_install
+
 
 %files
 %doc README AUTHORS
@@ -94,13 +99,6 @@ logging.
 # Java does not support multilib.
 # https://fedorahosted.org/fesco/ticket/961
 %{_prefix}/lib/abrt-java-connector
-
-
-%check
-make test || {
-    cat Testing/Temporary/LastTest.log
-    exit 1
-}
 
 
 %changelog
