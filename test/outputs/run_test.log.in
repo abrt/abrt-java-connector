@@ -27,7 +27,7 @@ Exception in thread "main" java.io.FileNotFoundException: /root/.bashrc (Permiss
 	at Test.main(Test.java:513) [file:@CMAKE_BINARY_DIR@/test/Test.class]
 executable: @CMAKE_BINARY_DIR@/test/Test.class
 Caught exception java.net.UnknownHostException in method java.net.Inet4AddressImpl.lookupAllHostAddr()
-Exception in thread "main" java.net.UnknownHostException: xyzzy: Name or service not known
+Exception in thread "main" java.net.UnknownHostException: xyzzy: Temporary failure in name resolution
 	at java.base/java.net.Inet4AddressImpl.lookupAllHostAddr(Native Method) [jrt:/java.base/java/net/Inet4AddressImpl.class]
 	at java.base/java.net.InetAddress$PlatformNameService.lookupAllHostAddr(InetAddress.java:LINENO) [jrt:/java.base/java/net/InetAddress$PlatformNameService.class]
 	at java.base/java.net.InetAddress.getAddressesFromNameService(InetAddress.java:LINENO) [jrt:/java.base/java/net/InetAddress.class]
