@@ -24,7 +24,7 @@ if [ -n "$5" ] && [ 1 -eq $5 ]; then
                    { if (main == 1) { print $0 } }
 /\s*at .*\.main\(/ { if (main == 0) { print pfx$0; main = 1 } }
                    { pfx = "" }
-/^executable:/     { pfx = $0"\n" }' | tac > $TMP_RESULT
+/^executable:/     { pfx = $0"\n" }' | tac | sed -e '/java.net.UnknownHostException: xyzzy:/s/xyzzy: .*/xyzzy/' > $TMP_RESULT
 else
     cp $4 $TMP_RESULT
 fi
