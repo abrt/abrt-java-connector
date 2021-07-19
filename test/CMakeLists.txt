@@ -333,7 +333,6 @@ _add_test(run_remote_thread 0)
 _add_analyze_test(not_reportable_1remote_class)
 _add_analyze_test(not_reportable_3remote_classes)
 _add_analyze_test(unusable)
-_add_analyze_test(unpackaged)
 
 _add_test_target(
     run_three_times
@@ -351,6 +350,8 @@ _add_test_target(
     AGENT_OPTIONS debugmethod=DataMethodTest.debugStringData
 )
 _add_test(run_data_method 2)
+
+_add_analyze_test(unpackaged)
 
 add_custom_target(
     run_jar_relative
