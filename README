@@ -153,3 +153,5 @@ All build results are stored in ./bin directory.
 The `check' make target will fail if you run it under root user. There are some
 test cases that try to generate 'File Access Denied' exceptions and the easiest
 way to achieve that is to try to access a root's file.
+
+Also, the `check` target will fail if you're running it from anywhere under `/home`. This is because the satyr sr_java_stacktrace_parse function in the "unpackaged" test anonymizes the path to the java testing code which results in the test looking for a non-existent file under `/home/anonymized/`.
