@@ -357,7 +357,7 @@ int main(int argc, char *argv[])
     {
         results_iter->name = FILENAME_NOT_REPORTABLE;
         results_iter->data = g_strdup_printf(
-        _("This problem can be caused by a 3rd party code from the "\
+        _("This problem can be caused by 3rd party code from the "\
         "jar/class at %s. In order to provide valuable problem " \
         "reports, ABRT will not allow you to submit this problem. If you " \
         "still want to participate in solving this problem, please contact " \
@@ -381,8 +381,8 @@ int main(int argc, char *argv[])
     {
         results_iter->name = FILENAME_NOT_REPORTABLE;
         results_iter->data = g_strdup_printf(
-        _("This problem has been caused by a proprietary code which has not been "
-        "provided any official package. Please contact the provider of the "
+        _("This problem was caused by proprietary code not "
+        "provided by any official package. Please contact the author of the "
         "proprietary code.")
         );
         ++results_iter;
