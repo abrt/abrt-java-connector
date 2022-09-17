@@ -8,6 +8,11 @@ License:       GPLv2+
 URL:           https://github.com/abrt/abrt-java-connector
 Source0:       %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 
+# https://fedoraproject.org/wiki/Changes/Drop_i686_JDKs
+%if 0%{?fedora} >= 37
+ExcludeArch:   %{ix86}
+%endif
+
 BuildRequires: pkgconfig(abrt) >= 2.14.1
 BuildRequires: check-devel
 BuildRequires: cmake
