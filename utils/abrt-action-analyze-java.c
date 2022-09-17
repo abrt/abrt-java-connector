@@ -25,6 +25,7 @@
 #include <rpm/rpmts.h>
 #include <rpm/rpmcli.h>
 #include <rpm/rpmdb.h>
+#include <rpm/rpmcrypto.h>
 
 #include <abrt/libabrt.h>
 #include <stdlib.h>
