@@ -4,7 +4,7 @@ Release:       1%{?dist}
 Summary:       JNI Agent library converting Java exceptions to ABRT problems
 
 Group:         System Environment/Libraries
-License:       GPLv2+
+License:       GPL-2.0-or-later
 URL:           https://github.com/abrt/abrt-java-connector
 Source0:       %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 
